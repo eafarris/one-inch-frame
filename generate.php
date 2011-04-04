@@ -5,22 +5,34 @@
  * Generate the HTML for the site
  */
 
+// EXTERNAL LIBRARIES
 require_once('includes/markdownphp/markdown.php');
 require_once('includes/lessphp/lessc.inc.php');
+
+// CONFIGURATION
 require_once('config.php');
 
-process_less();
-$templstrings[] = '/<head>/';
-$replstrings[]  = "<head>\n" . implode('', $head);
+// INTERNAL FILTERS
+require_once('freelinks.inc');
 
-foreach (glob($datafiles. '/*')  as $infile) {
+process_less();
+$headtempl[] = '/<head>/';
+$headrepl[]  = "<head>\n" . implode('', $head);
+
+foreach (glob($datafiles. '/*.mkd')  as $infile) {
   if (is_file($infile)) {
     $ifn = pathinfo($infile, PATHINFO_FILENAME);
     print "Processing file: $infile\n";
     $input = file($infile);
 
+    $sources[] = get_metadata($infile);
+
+    $templstrings = $headtempl;
+    $replstrings  = $headrepl;
+
+    $title = process_title(array_shift($input));
     $templstrings[] = '/<!-- title goes here -->/';
-    $replstrings[]  = process_title(array_shift($input));
+    $replstrings[]  = $title;
 
     $tags = process_tags(array_shift($input));
 
@@ -76,6 +88,15 @@ function process_tags($text) {
 } // endfunction process_tags
 
 function process_article($text) {
-  return markdown($text);
+  return markdown(expand_freelinks($text));
 }
 
+function get_metadata($file) {
+  global $outputdir;
+  $metadata['access_time']  = filemtime($file);
+  $metadata['filename']     = pathinfo($file, PATHINFO_FILENAME);
+  $metadata['outfile_uri']  = $metadata['filename'] . '.html';
+  $metadata['outfile_path'] = $outputdir . '/' . $metadata['outfile_uri'];
+
+  return $metadata;
+} // endfunction get_metadata
