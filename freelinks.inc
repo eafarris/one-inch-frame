@@ -12,7 +12,7 @@ function expand_freelinks($text) {
   if ($matches > 0) { // found at least one freelink
     foreach ($simplematches as $match) { // loop through simple freelinks
       $patterns[] = '/' . preg_quote($match[0]) . '/';
-      $replacements[] = '<a href="' . strtr($match[1], ' ', '-') . '">' . $match[1] . '</a>';
+      $replacements[] = '<a href="' . strtr($match[1], ' ', '-') . '.html">' . $match[1] . '</a>';
     } // endforeach looping through simple matches
   } // endif at least one simple match
 
