@@ -16,25 +16,32 @@ require_once('config.php');
 require_once('freelinks.inc');
 
 process_less();
-$headtempl[] = '/<head>/';
-$headrepl[]  = "<head>\n" . implode('', $head);
+$headtempl = '/<head>/';
+$headrepl  = "<head>\n" . implode('', $head);
+$headertempl = '/<!-- header goes here -->/';
+$headerrepl = file_get_contents($templates . '/header.html');
+$footertempl = '/<!-- footer goes here -->/';
+$footerrepl  = file_get_contents($templates . '/footer.html');
 
 foreach (glob($datafiles. '/*.mkd')  as $infile) {
+  $templstrings = array();
+  $replstrings  = array();
   if (is_file($infile)) {
     $ifn = pathinfo($infile, PATHINFO_FILENAME);
     print "Processing file: $infile\n";
     $input = file($infile);
 
-    $sources[] = get_metadata($infile);
+    $sources[$infile] = get_metadata($infile);
 
-    $templstrings = $headtempl;
-    $replstrings  = $headrepl;
+    $templstrings[] = $headtempl;
+    $replstrings[]  = $headrepl;
+    $templstrings[] = $headertempl;
+    $replstrings[]  = $headerrepl;
+    $templstrings[] = $footertempl;
+    $replstrings[]  = $footerrepl;
 
-    $title = process_title(array_shift($input));
     $templstrings[] = '/<!-- title goes here -->/';
-    $replstrings[]  = $title;
-
-    $tags = process_tags(array_shift($input));
+    $replstrings[]  = $sources[$infile]['title'];
 
     $templstrings[] = '/<!-- meat goes here -->/';
     $replstrings[]  = process_article(implode('', $input));
@@ -43,7 +50,7 @@ foreach (glob($datafiles. '/*.mkd')  as $infile) {
 
     $output = preg_replace($templstrings, $replstrings, $template);
 
-    $ofn = $outputdir . '/' . $ifn . '.html';
+    $ofn = $sources[$infile]['outfile_path'];
     $ofh = fopen($ofn, 'w');
     fwrite($ofh, $output);
     fclose($ofh);
@@ -51,6 +58,9 @@ foreach (glob($datafiles. '/*.mkd')  as $infile) {
 
   } // endif filename matches a file
 } // endforeach looping through files
+
+print_r($sources);
+
 
 // FUNCTIONS BELOW
 
@@ -93,10 +103,19 @@ function process_article($text) {
 
 function get_metadata($file) {
   global $outputdir;
+  $contents = file_get_contents($file);
   $metadata['access_time']  = filemtime($file);
   $metadata['filename']     = pathinfo($file, PATHINFO_FILENAME);
   $metadata['outfile_uri']  = $metadata['filename'] . '.html';
   $metadata['outfile_path'] = $outputdir . '/' . $metadata['outfile_uri'];
+
+  preg_match('/^TITLE: (.*)/m' , $contents, &$title);
+  $metadata['title'] = $title[1];
+
+  preg_match('/^TAGS: (.*)/m', $contents, &$tagstring);
+  $tags = explode(',', $tagstring[1]);
+  array_walk($tags, create_function('&$text', '$text = trim($text);'));
+  $metadata['tags'] = $tags;
 
   return $metadata;
 } // endfunction get_metadata
