@@ -4,6 +4,8 @@
  *
  */
 
+// WEBROOTURL: Full URL to the root of this website
+$webrooturl = 'http://localhost/~eafarris';
 // DATAFILES: path where raw posts are stored
 $datafiles = '/Users/eafarris/Dropbox/oif';
 
