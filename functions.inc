@@ -8,7 +8,6 @@ function process_less() {
   global $lessfiles;
   global $templates;
   global $outputdir;
-  global $head;
   foreach ($lessfiles as $lessfile) {
     $lessfn = $templates . '/' . $lessfile;
     $cssfile = pathinfo($lessfn, PATHINFO_FILENAME) . '.css';
@@ -23,6 +22,7 @@ function process_less() {
     print "Wrote file: $cssfn\n";
     $head[] = '<link rel="stylesheet" type="text/css" href="' . $webrooturl . '/' . $cssfile . '">' . "\n";
   } // endforeach looping through less assets
+  return $head;
 } // endfunction process_less
 
 function process_title($text) {
@@ -90,3 +90,26 @@ function generate_recent_content_block($sources) {
   return $block;
 } // endfunction generate_recent_content_block
 
+// Takes content and a template file and returns a generated page
+function expand_template($head, $header, $footer, $sidebar, $title, $meat, $tags, $templatefile) {
+  global $templates;
+  $templstrings[] = '/<head>/';
+  $replstrings[]  = "<head>\n" . implode('', $head);
+  $templstrings[] = '/<!-- header goes here -->/';
+  $replstrings[]  = $header;
+  $templstrings[] = '/<!-- footer goes here -->/';
+  $replstrings[]  = $footer;
+  $templstrings[] = '/<!-- sidebar contents goes here -->/';
+  $replstrings[]  = $sidebar;
+  $templstrings[] = '/<!-- title goes here -->/';
+  $replstrings[]  = $title;
+  $templstrings[] = '/<!-- meat goes here -->/';
+  $replstrings[]  = $meat;
+  $templstrings[] = '/<!-- tags go here -->/';
+  $replstrings[]  = $tags;
+
+  $template = file_get_contents($templates . '/' . $templatefile);
+  $output = preg_replace($templstrings, $replstrings, $template);
+
+  return $output;
+}

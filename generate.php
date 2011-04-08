@@ -18,12 +18,8 @@ require_once('config.php');
 // INTERNAL FILTERS
 require_once('freelinks.inc');
 
-process_less();
-$headtempl = '/<head>/';
-$headrepl  = "<head>\n" . implode('', $head);
-$headertempl = '/<!-- header goes here -->/';
+$headrepl = process_less();
 $headerrepl = file_get_contents($templates . '/header.html');
-$footertempl = '/<!-- footer goes here -->/';
 $footerrepl  = file_get_contents($templates . '/footer.html');
 
 /*
@@ -45,7 +41,6 @@ array_multisort($dates, SORT_DESC, $sources);
 
 print "\n";
 
-$sidebartempl = '/<!-- sidebar content goes here -->/';
 $sidebarrepl  = generate_recent_content_block($sources);
 
 /*
@@ -64,19 +59,11 @@ for ($a = 1; $a < 10; $a++) {
 }
 $indexcontent .= "</ul>\n";
 
-$templstrings = array();
-$replstrings  = array();
-$templstrings[] = $headtempl;
-$replstrings[]  = $headrepl;
-$templstrings[] = $headertempl;
-$replstrings[]  = $headerrepl;
-$templstrings[] = $footertempl;
-$replstrings[]  = $footerrepl;
-$templstrings[] = '/<!-- meat goes here -->/';
-$replstrings[]   = $indexcontent;
+$meatrepl = $indexcontent;
+$tagsrepl = $sources[0]['tags_ul'];
 
 $template = file_get_contents($templates . '/index.html');
-$output = preg_replace($templstrings, $replstrings, $template);
+$output = expand_template($headrepl, $headerrepl, $footerrepl, $sidebarrepl, NULL, $meatrepl, $tagsrepl, 'index.html');
 $ofn = $outputdir . '/index.html';
 $ofh = fopen($ofn, 'w');
 fwrite($ofh, $output);
@@ -86,29 +73,12 @@ fclose($ofh);
  * GENERATE PAGES OUTPUT
  */
 foreach ($sources as $key => $metadata) {
-  $templstrings = array();
-  $replstrings  = array();
-  $templstrings[] = $headtempl;
-  $replstrings[]  = $headrepl;
-  $templstrings[] = $headertempl;
-  $replstrings[]  = $headerrepl;
-  $templstrings[] = $footertempl;
-  $replstrings[]  = $footerrepl;
-  $templstrings[] = $sidebartempl;
-  $replstrings[]  = $sidebarrepl;
-
-  $templstrings[] = '/<!-- title goes here -->/';
-  $replstrings[]  = $metadata['title'];
-
-  $templstrings[] = '/<!-- tags go here -->/';
-  $replstrings[]  = $metadata['tags_ul'];
-
-  $templstrings[] = '/<!-- meat goes here -->/';
-  $replstrings[]  = process_article(file_get_contents($metadata['infile']));
-
+  $titlerepl = $metadata['title'];
+  $tagsrepl = $metadata['tags_ul'];
+  $meatrepl = process_article(file_get_contents($metadata['infile']));
   $template = file_get_contents($templates . '/pages.html');
 
-  $output = preg_replace($templstrings, $replstrings, $template);
+  $output = expand_template($headrepl, $headerrepl, $footerrepl, $sidebarrepl, $titlerepl, $meatrepl, $tagsrepl, 'pages.html');
 
   $ofn = $metadata['outfile_path'];
   $ofh = fopen($ofn, 'w');
@@ -136,25 +106,12 @@ $tagindex = "<ul>\n";
 
 foreach ($tags as $tag) {
   $tagfn = $tag . '.html';
-  $templstrings = array();
-  $replstrings  = array();
-  $templstrings[] = $headtempl;
-  $replstrings[]  = $headrepl;
-  $templstrings[] = $headertempl;
-  $replstrings[]  = $headerrepl;
-  $templstrings[] = $footertempl;
-  $replstrings[]  = $footerrepl;
-  $templstrings[] = $sidebartempl;
-  $replstrings[]  = $sidebarrepl;
-  $templstrings[] = '/<!-- title goes here -->/';
-  $replstrings[]  = 'Tag: ' . $tag;
-  $templstrings[] = '/<!-- meat goes here -->/';
-  $replstrings[]  = '<ul>' . $tagged[$tag] . '</ul>';
+  $tagsrepl = 'Tag: ' . $tag;
+  $meatrepl = '<ul>' . $tagged[$tag] . '</ul>';
 
   $tagindex .= '<li><a href="' . $webrooturl . '/tags/' . $tagfn . '">' . $tag . "</a>\n";
   
-  $template = file_get_contents($templates . '/pages.html');
-  $output = preg_replace($templstrings, $replstrings, $template);
+  $output = expand_template($headrepl, $headerrepl, $footerrepl, $sidebarrepl, $titlerepl, $meatrepl, $tagsrepl, 'pages.html');
   $ofn = $outputdir . '/tags/' . $tagfn;
   $ofh = fopen($ofn, 'w');
   fwrite($ofh, $output);
@@ -163,21 +120,9 @@ foreach ($tags as $tag) {
 
 $tagindex .= "</ul>\n";
 
-$templstrings = array();
-$replstrings  = array();
-$templstrings[] = $headtempl;
-$replstrings[]  = $headrepl;
-$templstrings[] = $headertempl;
-$replstrings[]  = $headerrepl;
-$templstrings[] = $footertempl;
-$replstrings[]  = $footerrepl;
-$templstrings[] = $sidebartempl;
-$replstrings[]  = $sidebarrepl;
-$templstrings[] = '/<!-- title goes here -->/';
-$replstrings[]  = 'Tag index';
-$templstrings[] = '/<!-- meat goes here -->/';
-$replstrings[]  = $tagindex;
-$output = preg_replace($templstrings, $replstrings, $template);
+$titlerepl = 'Tag index';
+$meatrepl = $tagindex;
+$output = expand_template($headrepl, $headerrepl, $footerrepl, $sidebarrepl, $titlerepl, $meatrepl, $tagsrepl, 'index.html');
 $ofn = $outputdir . '/tags/index.html';
 $ofh = fopen($ofn, 'w');
 fwrite($ofh, $output);
