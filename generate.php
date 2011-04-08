@@ -41,7 +41,7 @@ foreach (glob($datafiles. '/*.mkd')  as $infile) {
 foreach ($sources as $key => $metadata) {
   $dates[] = $metadata['access_time'];
 }
-array_multisort($sources, SORT_DESC, $dates);
+array_multisort($dates, SORT_DESC, $sources);
 
 print "\n";
 
