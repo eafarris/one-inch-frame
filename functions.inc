@@ -33,16 +33,26 @@ function process_title($text) {
 function process_tags($text) {
   preg_match('/^TAGS: (.*)/', $text, &$tagtext);
   $tags = explode(',', $tagtext[1]);
-  array_walk($tags, create_function('&$text', '$text = trim($text);'));
+  array_walk($tags, create_function('&$text', '$text = trim(lcase($text));'));
   return $tags;
 } // endfunction process_tags
 
 function process_article($text) {
-  return markdown(expand_freelinks($text));
+  global $mmdpath;
+  // to use php markdown:
+  // $output =  markdown(expand_freelinks($text));
+  $tempname = tempnam('/Volumes/second/tmp', 'php');
+  $temphandle = fopen($tempname, 'w');
+  fwrite($temphandle, expand_freelinks($text));
+  fclose($temphandle);
+  $output = shell_exec("cat $tempname | $mmdpath");
+  unlink($tempname);
+  return $output;
 }
 
 function get_metadata($file) {
   global $outputdir;
+  global $webrooturl;
   $contents = file_get_contents($file);
   $metadata['infile']       = $file;
   $metadata['access_time']  = filemtime($file);
@@ -59,7 +69,7 @@ function get_metadata($file) {
   $metadata['tags'] = $tags;
   $metadata['tags_ul'] = "<ul>\n";
   foreach ($tags as $tag) {
-    $metadata['tags_ul'] .= '<li><a class="tag" href="tags/' . $tag .  '.html">' . $tag . "</a>\n";
+    $metadata['tags_ul'] .= '<li><a class="tag" href="' . $webrooturl . '/tags/' . $tag .  '.html">' . $tag . "</a>\n";
   } // endforeach looping through tags
   $metadata['tags_ul'] .= "</ul>";
 
@@ -91,25 +101,39 @@ function generate_recent_content_block($sources) {
 } // endfunction generate_recent_content_block
 
 // Takes content and a template file and returns a generated page
-function expand_template($head, $header, $footer, $sidebar, $title, $meat, $tags, $templatefile) {
+function expand_template($replacements, $templatefile) {
   global $templates;
-  $templstrings[] = '/<head>/';
-  $replstrings[]  = "<head>\n" . implode('', $head);
-  $templstrings[] = '/<!-- header goes here -->/';
-  $replstrings[]  = $header;
-  $templstrings[] = '/<!-- footer goes here -->/';
-  $replstrings[]  = $footer;
-  $templstrings[] = '/<!-- sidebar contents goes here -->/';
-  $replstrings[]  = $sidebar;
-  $templstrings[] = '/<!-- title goes here -->/';
-  $replstrings[]  = $title;
-  $templstrings[] = '/<!-- meat goes here -->/';
-  $replstrings[]  = $meat;
-  $templstrings[] = '/<!-- tags go here -->/';
-  $replstrings[]  = $tags;
+  $patterns['head']    = '/<head>/';
+  $patterns['header']  = '/<!-- header goes here -->/';
+  $patterns['footer']  = '/<!-- footer goes here -->/';
+  $patterns['sidebar'] = '/<!-- sidebar content goes here -->/';
+  $patterns['title']   = '/<!-- title goes here -->/';
+  $patterns['meat']    = '/<!-- meat goes here -->/';
+  $patterns['tags']    = '/<!-- tags go here -->/';
+  $replacements['head']  = "<head>\n" . implode('', $replacements['head']);
+  ksort($patterns);
+  ksort($replacements);
 
   $template = file_get_contents($templates . '/' . $templatefile);
-  $output = preg_replace($templstrings, $replstrings, $template);
+  $output = preg_replace($patterns, $replacements, $template);
 
   return $output;
-}
+} // endfunction expand_template
+
+// takes a slice of $metadata and returns the HTML (page or snippet)
+function generate_content($metadata, $fullpage = TRUE) {
+  global $templates;
+  global $replacements;
+  $content = process_article(file_get_contents($metadata['infile']));
+  if (!$fullpage) {
+    return $content;
+  } // endif don't generate full page
+  $replacements['title'] = $metadata['title'];
+  $replacements['tags']  = $metadata['tags_ul'];
+  $replacements['meat']  = $content;
+  $template = 'pages.html';
+  $output = expand_template($replacements, $template);
+  return $output;
+} // endfunction generate_content
+
+// vim: tw=300 nowrap syn=php

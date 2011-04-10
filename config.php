@@ -6,6 +6,7 @@
 
 // WEBROOTURL: Full URL to the root of this website
 $webrooturl = 'http://localhost/~eafarris';
+
 // DATAFILES: path where raw posts are stored
 $datafiles = '/Users/eafarris/Dropbox/oif';
 
@@ -15,5 +16,8 @@ $templates = '/Users/eafarris/Dropbox/oif/templates';
 // OUTPUTDIR: where to place the output files
 $outputdir = '/Users/eafarris/Sites';
 
-//LESSFILES: array of files in lesscss format in TEMPLATES directory
+// LESSFILES: array of files in lesscss format in TEMPLATES directory
 $lessfiles[] = 'oif.less';
+
+// MMDPATH: full system path to the Multimarkdown binary
+$mmdpath = '/usr/local/bin/mmd';
