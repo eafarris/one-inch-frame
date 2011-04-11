@@ -25,7 +25,7 @@ $replacements['footer']  = file_get_contents($templates . '/footer.html');
 /*
  * GRAB METADATA
  */
-foreach (glob($datafiles. '/*.mkd')  as $infile) {
+foreach (glob($datafiles. '/*.md')  as $infile) {
   if (is_file($infile)) {
     $sources[] = get_metadata($infile);
   } // endif filename matches a file
