@@ -52,7 +52,7 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  * and links for the next 9 (10 total). No sidebar on the index page.
  */
 
-$indexcontent  = '<h1>' . $sources[0]['title'] . "</h1\n";
+$indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
 $indexcontent .= '<div id="nextnine">' . "\n";
 $indexcontent .= "<h2>Recent content</h2>\n<ul>\n";
