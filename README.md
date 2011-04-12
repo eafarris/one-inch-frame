@@ -13,6 +13,11 @@ calls an external binary to do the Markdown conversion (Fletcher Penny's
 Multimarkdown), but can be converted to use PHP Markdown or any other
 HTML generator, or even no generator at all.
 
+In addition to the standard Markdown format, OIF allows for
+inter-linking between pages using the "freelinking" format of double
+square brackets, and includes a special [[w:format]] format for linking
+to Wikipedia articles. More freelink formats may be added in the future.
+
 OIF does not use a database. The generate.php script does not care if
 files have been modified or not; it regenerates the whole site, on every
 invocation. It generates my test site (about 400 small Markdown sources)
