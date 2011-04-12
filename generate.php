@@ -49,19 +49,19 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  * GENERATE INDEX PAGE
  *
  * For index.html, we'll show the full text for the most recent post, 
- * and links for the next 9 (10 total). No sidebar on the index page.
+ * and links for the next 15. No sidebar on the index page.
  */
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
-$indexcontent .= '<div id="nextnine">' . "\n";
-$indexcontent .= "<h2>Recent content</h2>\n<ul>\n";
-for ($a = 1; $a < 10; $a++) {
-  $indexcontent .= '<li>' . l($sources[$a]) . "\n";
+$bottomcontent .= "<h2>Recent content</h2>\n<ul>\n";
+for ($a = 1; $a < 15; $a++) {
+  $bottomcontent .= '<li>' . l($sources[$a]) . "\n";
 }
-$indexcontent .= "</ul>\n";
+$bottomcontent .= "</ul>\n";
 
 $replacements['meat'] = $indexcontent;
+$replacements['bottom'] = $bottomcontent;
 $replacements['tags'] = $sources[0]['tags_ul'];
 
 $template = file_get_contents($templates . '/index.html');
