@@ -32,7 +32,7 @@ foreach (glob($datafiles. '/*.md')  as $infile) {
 } // endforeach looping through files
 
 foreach ($sources as $key => $metadata) {
-  $dates[] = $metadata['access_time'];
+  $dates[] = $metadata['posted'];
 }
 array_multisort($dates, SORT_DESC, $sources);
 // $sources (metadata array) is now sorted in reverse cron (ie., "blog") 
@@ -136,7 +136,7 @@ $tagindex .= "</ul>\n";
 
 $replacements['title'] = 'Tag index';
 $replacements['meat']  = $tagindex;
-$output = expand_template($replacements, 'index.html');
+$output = expand_template($replacements, 'tagindex.html');
 $ofn = $outputdir . '/tags/index.html';
 $ofh = fopen($ofn, 'w');
 fwrite($ofh, $output);

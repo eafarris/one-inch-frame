@@ -55,10 +55,18 @@ function get_metadata($file) {
   global $webrooturl;
   $contents = file_get_contents($file);
   $metadata['infile']       = $file;
-  $metadata['access_time']  = filemtime($file);
   $metadata['filename']     = pathinfo($file, PATHINFO_FILENAME);
   $metadata['outfile_uri']  = $metadata['filename'] . '.html';
   $metadata['outfile_path'] = $outputdir . '/' . $metadata['outfile_uri'];
+
+  preg_match('/^DATE: (.*)/m', $contents, &$posted);
+  $accessed_time = filemtime($file);
+  if (empty($posted[1])) {
+    $metadata['posted'] = $accessed_time;
+  }
+  else {
+    $metadata['posted'] = $posted[1];
+  }
 
   preg_match('/^TITLE: (.*)/m' , $contents, &$title);
   $metadata['title'] = $title[1];
@@ -74,7 +82,7 @@ function get_metadata($file) {
   $metadata['tags_ul'] .= "</ul>";
 
   foreach ($metadata as $file => $data) {
-    $dates[] = $data['access_time'];
+    $dates[] = $data['posted'];
   }
   array_multisort ($metadata, SORT_DESC, $dates);
   // $sources array now sorted in reverse cron order
