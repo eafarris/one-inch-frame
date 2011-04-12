@@ -18,6 +18,11 @@ inter-linking between pages using the "freelinking" format of double
 square brackets, and includes a special [[w:format]] format for linking
 to Wikipedia articles. More freelink formats may be added in the future.
 
+The system supports a notion that I'm calling "supertags." A supertag is
+an article with the same name as a tag. When the tags are generated, the
+article's content will be prepended to the list of articles also using
+that tag. Easier to use than describe.
+
 OIF does not use a database. The generate.php script does not care if
 files have been modified or not; it regenerates the whole site, on every
 invocation. It generates my test site (about 400 small Markdown sources)
