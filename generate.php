@@ -62,6 +62,7 @@ $bottomcontent .= "</ul>\n";
 
 $replacements['meat'] = $indexcontent;
 $replacements['bottom'] = $bottomcontent;
+$replacements['date']   = date('j F Y', $sources[0]['date']);
 $replacements['tags'] = $sources[0]['tags_ul'];
 
 $template = file_get_contents($templates . '/index.html');

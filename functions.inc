@@ -116,9 +116,14 @@ function expand_template($replacements, $templatefile) {
   $patterns['footer']  = '/<!-- footer goes here -->/';
   $patterns['sidebar'] = '/<!-- sidebar content goes here -->/';
   $patterns['title']   = '/<!-- title goes here -->/';
+  $patterns['date']    = '/<!-- date goes here -->/';
   $patterns['meat']    = '/<!-- meat goes here -->/';
   $patterns['tags']    = '/<!-- tags go here -->/';
+  $patterns['bottom']  = '/<!-- bottom section goes here -->/';
   $replacements['head']  = "<head>\n" . implode('', $replacements['head']);
+  if (empty($replacements['bottom'])) {
+    $replacements['bottom'] = '';
+  }
   ksort($patterns);
   ksort($replacements);
 
@@ -139,6 +144,7 @@ function generate_content($metadata, $fullpage = TRUE) {
   $replacements['title'] = $metadata['title'];
   $replacements['tags']  = $metadata['tags_ul'];
   $replacements['meat']  = $content;
+  $replacements['date']  = date('j F Y', $metadata['posted']);
   $template = 'pages.html';
   $output = expand_template($replacements, $template);
   return $output;
