@@ -6,7 +6,6 @@
  */
 
 // EXTERNAL LIBRARIES
-#require_once('includes/markdownphp/markdown.php');
 require_once('includes/lessphp/lessc.inc.php');
 
 // INTERNAL HELPER FUNCTIONS
@@ -38,9 +37,36 @@ array_multisort($dates, SORT_DESC, $sources);
 // $sources (metadata array) is now sorted in reverse cron (ie., "blog") 
 // order. $sources[0] is the most recently edited content.
 
+// 
+// build RSS feed of last 10 articles
+//
+$xml  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
+$xml .= '<rss version="2.0">' . "\n<channel>\n";
+$xml .= "<title>eafarris.com</title>\n<link>http://www.eafarris.com</link>\n";
+$xml .= "<description>RSS feed of the last 10 items from eafarris.com</description>\n";
+$xml .= "<lastBuildDate>" . date('r') . "</lastBuildDate>\n<language>en-us</language>\n";
+for ($a = 0 ; $a < 9; $a++) {
+  $xml .= "<item>\n";
+  $xml .= '<title>' . $sources[$a]['title_text'] . "</title>\n";
+  if ($sources[$a]['type'] == 'link') {
+    $xml .= '<link>' . $sources[$a]['url'] . "</link>\n";
+  }
+  else {
+    $xml .= '<link>' . $webrooturl . '/' . $sources[$a]['outfile_uri'] . "</link>\n";
+  }
+  $xml .= '<guid>' . $webrooturl . '/' . $sources[$a]['outfile_uri'] . "</guid>\n";
+  $xml .= '<pubDate>' . date('r', $sources[$a]['posted']) . "</pubDate>\n";
+  $xml .= "</item>\n\n";
+} // endfor looping through items for RSS feed
+$xml .= "</channel>\n</rss>\n";
+$ofn = $outputdir . '/rss.xml';
+$ofh = fopen($ofn, 'w');
+fwrite($ofh, $xml);
+fclose($ofh);
+
 // generate a titles array to search for supertags later
 foreach ($sources as $key => $metadata) {
-  $titles[$key] = strtolower($metadata['title']);
+  $titles[$key] = strtolower($metadata['title_text']);
 }
 
 $replacements['sidebar'] = generate_recent_content_block($sources);
@@ -53,6 +79,9 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  */
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
+if ($sources[0]['type'] == 'image') {
+  $indexcontent .= '<img src="' . $sources[0]['url'] . '" />';
+}
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
 $bottomcontent .= "<h2>Recent content</h2>\n<ul>\n";
 for ($a = 1; $a < 15; $a++) {

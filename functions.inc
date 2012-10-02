@@ -25,23 +25,11 @@ function process_less() {
   return $head;
 } // endfunction process_less
 
-function process_title($text) {
-  preg_match('/^TITLE: (.*)/', $text, &$title);
-  return $title[1];
-} // endfunction process_title
-
-function process_tags($text) {
-  preg_match('/^TAGS: (.*)/', $text, &$tagtext);
-  $tags = explode(',', $tagtext[1]);
-  array_walk($tags, create_function('&$text', '$text = trim(lcase($text));'));
-  return $tags;
-} // endfunction process_tags
-
 function process_article($text) {
   global $mmdpath;
   // to use php markdown:
   // $output =  markdown(expand_freelinks($text));
-  $tempname = tempnam('/Volumes/second/tmp', 'php');
+  $tempname = tempnam('/tmp', 'php');
   $temphandle = fopen($tempname, 'w');
   fwrite($temphandle, expand_freelinks($text));
   fclose($temphandle);
@@ -69,7 +57,21 @@ function get_metadata($file) {
   }
 
   preg_match('/^TITLE: (.*)/m' , $contents, &$title);
-  $metadata['title'] = $title[1];
+  $metadata['title_text'] = $title[1];
+
+  preg_match('/^TYPE: (.*)/m', $contents, &$type);
+  $metadata['type'] = $type[1];
+
+  preg_match('/^URL: (.*)/m', $contents, &$url);
+  $metadata['url'] = $url[1];
+
+  // if this is a link, wrap the title in an anchor tag
+  if ($metadata['type'] == 'link') {
+    $metadata['title'] = '<a href="' . $metadata['url'] . '">' . $metadata['title'] . '</a>';
+  }
+  else {
+    $metadata['title'] = $metadata['title_text'];
+  }
 
   preg_match('/^TAGS: (.*)/m', $contents, &$tagstring);
   $tags = explode(',', $tagstring[1]);
