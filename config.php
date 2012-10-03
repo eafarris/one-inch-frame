@@ -4,6 +4,9 @@
  *
  */
 
+// TZ setting
+date_default_timezone_set('America/New_York');
+
 // WEBROOTURL: Full URL to the root of this website
 $webrooturl = 'http://static.eafarris.com';
 
@@ -25,3 +28,8 @@ $mmdpath = '/usr/local/bin/mmd';
 // TWEETSPATH: full system path to the tweets.txt file (created by Dr. 
 //   Drang's archive-tweets.py script
 $tweetspath = '/Users/eafarris/Dropbox/twitter/tweets.txt';
+
+// WEBKIT2PNG: full path and options for webkit2png (paul hammond)
+//   function make_web_screenshot will add '--dir' and '--filename' 
+//   options
+$webkit2png = '/Users/eafarris/webkit2png/webkit2png --clipped --clipwidth=600 --clipheight=400 ';

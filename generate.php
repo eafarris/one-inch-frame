@@ -79,6 +79,8 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  */
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
+print_r($sources[0]);
+exit;
 if ($sources[0]['type'] == 'image') {
   $indexcontent .= '<img src="' . $sources[0]['url'] . '" />';
 }
