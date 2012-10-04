@@ -30,39 +30,11 @@ foreach (glob($datafiles. '/*.md')  as $infile) {
   } // endif filename matches a file
 } // endforeach looping through files
 
-foreach ($sources as $key => $metadata) {
-  $dates[] = $metadata['posted'];
-}
-array_multisort($dates, SORT_DESC, $sources);
+$sources = blog_order($sources);
 // $sources (metadata array) is now sorted in reverse cron (ie., "blog") 
 // order. $sources[0] is the most recently edited content.
 
-// 
-// build RSS feed of last 10 articles
-//
-$xml  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
-$xml .= '<rss version="2.0">' . "\n<channel>\n";
-$xml .= "<title>eafarris.com</title>\n<link>http://www.eafarris.com</link>\n";
-$xml .= "<description>RSS feed of the last 10 items from eafarris.com</description>\n";
-$xml .= "<lastBuildDate>" . date('r') . "</lastBuildDate>\n<language>en-us</language>\n";
-for ($a = 0 ; $a < 9; $a++) {
-  $xml .= "<item>\n";
-  $xml .= '<title>' . $sources[$a]['title_text'] . "</title>\n";
-  if ($sources[$a]['type'] == 'link') {
-    $xml .= '<link>' . $sources[$a]['url'] . "</link>\n";
-  }
-  else {
-    $xml .= '<link>' . $webrooturl . '/' . $sources[$a]['outfile_uri'] . "</link>\n";
-  }
-  $xml .= '<guid>' . $webrooturl . '/' . $sources[$a]['outfile_uri'] . "</guid>\n";
-  $xml .= '<pubDate>' . date('r', $sources[$a]['posted']) . "</pubDate>\n";
-  $xml .= "</item>\n\n";
-} // endfor looping through items for RSS feed
-$xml .= "</channel>\n</rss>\n";
-$ofn = $outputdir . '/rss.xml';
-$ofh = fopen($ofn, 'w');
-fwrite($ofh, $xml);
-fclose($ofh);
+build_rss_feed($sources);
 
 // generate a titles array to search for supertags later
 foreach ($sources as $key => $metadata) {

@@ -81,6 +81,10 @@ function get_metadata($file) {
   // posted becomes date, unless there's no date
   $metadata['posted'] = empty($metadata['date']) ? filemtime($file) : $metadata['date'];
 
+  // just going to add these, to get rid of potental E_ stuff later
+  $metadata['pre_content'] = '';
+  $metadata['post_content'] = '';
+
   return process_metadata($metadata);
 } //endfunction get_metadata
 
@@ -107,6 +111,13 @@ function process_metadata(&$metadata) {
     } // endswitch type
   } // endif type
 
+  if (!empty($metadata['source'])) { // Add source and original list to post-content
+    $metadata['post_content'] .= '<ul class="sources">';
+    $metadata['post_content'] .= '<li><a class="source" href="' . $metadata['source'] . '">(source)</a>';
+    $metadata['post_content'] .= '<li><a class="original" href="' . $metadata['url'] . '">(view original)</a>';
+    $metadata['post_content'] .= '</ul><!-- sources -->';
+  }
+
   // make tags_ul
   $metadata['tags_ul'] = '<ul class="tags">';
   foreach ($metadata['tags'] as $tag) {
@@ -125,25 +136,6 @@ function blog_order($sources) {
   array_multisort ($dates, SORT_DESC, $sources);
   return $sources;
 }
-
-
-/*
-function get_metadata($file) {
-
-  foreach ($tags as $tag) {
-    $metadata['tags_ul'] .= '<li><a class="tag" href="' . $webrooturl . '/tags/' . $tag .  '.html">' . $tag . "</a>\n";
-  } // endforeach looping through tags
-  $metadata['tags_ul'] .= "</ul>";
-
-  foreach ($metadata as $file => $data) {
-    $dates[] = $data['posted'];
-  }
-  array_multisort ($metadata, SORT_DESC, $dates);
-  // $sources array now sorted in reverse cron order
-
-  return $metadata;
-} // endfunction get_metadata
- */
 
 // function l -- returns HTML link to a file
 function l($file) {
@@ -240,9 +232,32 @@ function cache_image($url, $posted) {
   }
   else {
     copy($url, $localimage);
-    return $webrooturl . '/images/' . $posted . '.jpg';
   }
+    return $webrooturl . '/images/' . $posted . '.jpg';
 } // endfunction cache_image
 
-
-// vim: tw=300 nowrap syn=php
+function build_rss_feed($posts) { // RSS feed of the last 10 items
+  $xml  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
+  $xml .= '<rss version="2.0">' . "\n<channel>\n";
+  $xml .= "<title>eafarris.com</title>\n<link>http://www.eafarris.com</link>\n";
+  $xml .= "<description>RSS feed of the last 10 items from eafarris.com</description>\n";
+  $xml .= "<lastBuildDate>" . date('r') . "</lastBuildDate>\n<language>en-us</language>\n";
+  for ($a = 0 ; $a < 9; $a++) {
+    $xml .= "<item>\n";
+    $xml .= '<title>' . $posts[$a]['title_text'] . "</title>\n";
+    if ($posts[$a]['type'] == 'link') {
+      $xml .= '<link>' . $posts[$a]['url'] . "</link>\n";
+    }
+    else {
+      $xml .= '<link>' . $webrooturl . '/' . $posts[$a]['outfile_uri'] . "</link>\n";
+    }
+    $xml .= '<guid>' . $webrooturl . '/' . $posts[$a]['outfile_uri'] . "</guid>\n";
+    $xml .= '<pubDate>' . date('r', $posts[$a]['posted']) . "</pubDate>\n";
+    $xml .= "</item>\n\n";
+  } // endfor looping through items for RSS feed
+  $xml .= "</channel>\n</rss>\n";
+  $ofn = $outputdir . '/rss.xml';
+  $ofh = fopen($ofn, 'w');
+  fwrite($ofh, $xml);
+  fclose($ofh);
+} // endfunction build_rss_feed
