@@ -3,28 +3,6 @@
  * HELPER FUNCTIONS
  */
 
-function process_less() {
-  global $webrooturl;
-  global $lessfiles;
-  global $templates;
-  global $outputdir;
-  foreach ($lessfiles as $lessfile) {
-    $lessfn = $templates . '/' . $lessfile;
-    $cssfile = pathinfo($lessfn, PATHINFO_FILENAME) . '.css';
-    $cssfn  = $outputdir . '/' . $cssfile;
-    print "Processing file: $lessfn\n";
-    try {
-      lessc::ccompile($lessfn, $cssfn);
-    } // endtry complle lesscss file
-    catch (exception $ex) {
-      exit('FATAL ERROR in LESS compiler: ' . $ex->getMessage());
-    } // endcatch lesscss errors
-    print "Wrote file: $cssfn\n";
-    $head[] = '<link rel="stylesheet" type="text/css" href="' . $webrooturl . '/' . $cssfile . '">' . "\n";
-  } // endforeach looping through less assets
-  return $head;
-} // endfunction process_less
-
 function process_article($text) {
   global $mmdpath;
   // to use php markdown:
@@ -122,7 +100,7 @@ function process_metadata(&$metadata) {
   if (!empty($metadata['source'])) { // Add source and original list to post-content
     $metadata['post_content'] .= '<ul class="sources">';
     $metadata['post_content'] .= '<li><a class="source" href="' . $metadata['source'] . '">(source)</a>';
-    $metadata['post_content'] .= isset($metadata['url'] ? '<li><a class="original" href="' . $metadata['url'] . '">(view original)</a>' : '';
+    $metadata['post_content'] .= isset($metadata['url']) ? '<li><a class="original" href="' . $metadata['url'] . '">(view original)</a>' : '';
     $metadata['post_content'] .= '</ul><!-- sources -->';
   }
 
@@ -166,7 +144,6 @@ function generate_recent_content_block($sources) {
 // Takes content and a template file and returns a generated page
 function expand_template($replacements, $templatefile) {
   global $templates;
-  $patterns['head']       = '/<head>/';
   $patterns['header']     = '/<!-- header goes here -->/';
   $patterns['footer']     = '/<!-- footer goes here -->/';
   $patterns['sidebar']    = '/<!-- sidebar content goes here -->/';
@@ -176,7 +153,6 @@ function expand_template($replacements, $templatefile) {
   $patterns['meat']       = '/<!-- meat goes here -->/';
   $patterns['tags']       = '/<!-- tags go here -->/';
   $patterns['bottom']     = '/<!-- bottom section goes here -->/';
-  $replacements['head']   = "<head>\n" . implode('', $replacements['head']);
   if (empty($replacements['bottom'])) {
     $replacements['bottom'] = '';
   }

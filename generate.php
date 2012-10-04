@@ -5,9 +5,6 @@
  * Generate the HTML for the site
  */
 
-// EXTERNAL LIBRARIES
-require_once('includes/lessphp/lessc.inc.php');
-
 // INTERNAL HELPER FUNCTIONS
 require_once('functions.inc');
 
@@ -17,7 +14,6 @@ require_once('config.php');
 // INTERNAL FILTERS
 require_once('freelinks.inc');
 
-$replacements['head'] = process_less();
 $replacements['header'] = file_get_contents($templates . '/header.html');
 $replacements['footer']  = file_get_contents($templates . '/footer.html');
 
