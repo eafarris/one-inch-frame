@@ -99,7 +99,8 @@ function process_metadata(&$metadata) {
       $metadata['post_content'] = '</div><!-- quote -->';
       break;
     case 'image': // add image to pre-content
-      $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['url'] . '"></div><!-- image -->';
+      $metadata['image_url'] = cache_image($metadata['url'], $metadata['posted']);
+      $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['image_url'] . '"></div><!-- image -->';
       break;
     default:
       break;
@@ -226,7 +227,22 @@ function make_webshot($url, $posted) {
     //$output = shell_exec($commandline);
   }
   return $webrooturl . '/images/webshots/' . $posted . '-clipped.png';
-}
+} // endfunction make_webshot
+
+function cache_image($url, $posted) {
+  global $outputdir;
+  global $webrooturl;
+
+  $localimage = $outputdir . '/images/' . $posted . '.jpg';
+
+  if (file_exists($localimage)) {
+    print "File for this URL already exists. Not created.\n";
+  }
+  else {
+    copy($url, $localimage);
+    return $webrooturl . '/images/' . $posted . '.jpg';
+  }
+} // endfunction cache_image
 
 
 // vim: tw=300 nowrap syn=php
