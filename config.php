@@ -8,7 +8,7 @@
 date_default_timezone_set('America/New_York');
 
 // WEBROOTURL: Full URL to the root of this website
-$webrooturl = 'http://static.eafarris.com';
+$webrooturl = 'http://localhost/~eafarris';
 
 // DATAFILES: path where raw posts are stored
 $datafiles = '/Users/eafarris/Dropbox/oif';
@@ -27,7 +27,7 @@ $mmdpath = '/usr/local/bin/mmd';
 
 // TWEETSPATH: full system path to the tweets.txt file (created by Dr. 
 //   Drang's archive-tweets.py script
-$tweetspath = '/Users/eafarris/Dropbox/twitter/tweets.txt';
+$twitterpath = '/Users/eafarris/Dropbox/twitter/twitter.txt';
 
 // WEBKIT2PNG: full path and options for webkit2png (paul hammond)
 //   function make_web_screenshot will add '--dir' and '--filename' 

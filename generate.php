@@ -51,22 +51,21 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  */
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
-print_r($sources[0]);
-exit;
+
 if ($sources[0]['type'] == 'image') {
   $indexcontent .= '<img src="' . $sources[0]['url'] . '" />';
 }
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
-$bottomcontent .= "<h2>Recent content</h2>\n<ul>\n";
+$bottomcontent = "<h2>Recent content</h2>\n<ul>\n";
 for ($a = 1; $a < 15; $a++) {
   $bottomcontent .= '<li>' . l($sources[$a]) . "\n";
 }
 $bottomcontent .= "</ul>\n";
 
-$replacements['meat'] = $indexcontent;
+$replacements['meat']   = $indexcontent;
 $replacements['bottom'] = $bottomcontent;
-$replacements['date']   = date('j F Y', $sources[0]['date']);
-$replacements['tags'] = $sources[0]['tags_ul'];
+$replacements['date']   = date('j F Y', $sources[0]['posted']);
+$replacements['tags']   = $sources[0]['tags_ul'];
 
 $template = file_get_contents($templates . '/index.html');
 $output = expand_template($replacements, 'index.html');
@@ -102,7 +101,8 @@ sort($tags);
 
 foreach ($sources as $key => $metadata) {
   foreach ($metadata['tags'] as $tag) {
-    $tagged[$tag] .= '<li><a href="' . $webrooturl . '/' . $metadata['outfile_uri'] . '">' . $metadata['title'] . '</a>';
+    $tagline = '<li><a href="' . $webrooturl . '/' . $metadata['outfile_uri'] . '">' . $metadata['title'] . '</a>';
+    $tagged[$tag] = isset($tagged[$tag]) ? $tagged[$tag] . $tagline : $tagline;
   } // endforeach looping through tags
 } // endforeach
 

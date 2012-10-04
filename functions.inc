@@ -110,6 +110,9 @@ function process_metadata(&$metadata) {
       break;
     } // endswitch type
   } // endif type
+  else { // no type, we'll set it to 'unknown'
+    $metadata['type'] = 'unknown';
+  } // endifelse type
 
   if (!empty($metadata['source'])) { // Add source and original list to post-content
     $metadata['post_content'] .= '<ul class="sources">';
@@ -186,11 +189,9 @@ function generate_content($metadata, $fullpage = TRUE) {
   global $templates;
   global $replacements;
   global $webrooturl;
-  $content = process_article(file_get_contents($metadata['infile']));
-  $content .= '<p>This is a ' . $metadata['type'] .' post.</p>';
-  if ($metadata['type'] == 'link') {
-    $content .= '<div class="webshot"><img src="' . $webrooturl . '/images/webshots/' . $metadata['posted'] . '-clipped.png"></div><!-- webshot -->';
-  }
+  $content  = $metadata['pre_content'];
+  $content .= process_article(file_get_contents($metadata['infile']));
+  $content .= $metadata['post_content'];
   if (!$fullpage) {
     return $content;
   } // endif don't generate full page
@@ -237,6 +238,9 @@ function cache_image($url, $posted) {
 } // endfunction cache_image
 
 function build_rss_feed($posts) { // RSS feed of the last 10 items
+  global $webrooturl;
+  global $outputdir;
+
   $xml  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
   $xml .= '<rss version="2.0">' . "\n<channel>\n";
   $xml .= "<title>eafarris.com</title>\n<link>http://www.eafarris.com</link>\n";
@@ -261,3 +265,40 @@ function build_rss_feed($posts) { // RSS feed of the last 10 items
   fwrite($ofh, $xml);
   fclose($ofh);
 } // endfunction build_rss_feed
+
+function generate_twitter_block() {
+  global $twitterpath;
+
+  $tweetblock  = '<div class="tweetblock"><ul class="tweetblock">';
+
+  // read from the end
+  $offset = -1;
+  $c = '';
+  $read = '';
+  $i = 0;
+  $lines = 50;
+  $infilep = @fopen($twitterpath, "r");
+  while ( $lines && fseek($infilep, $offset, SEEK_END) >= 0 ) {
+    $c = fgetc($infilep);
+    if ($c == "\n") {
+      $lines--;
+      $tweets[] = strrev($read);
+      $read='';
+    }
+    else {
+      $read .= $c;
+    }
+    $offset--;
+  }
+  for ($a = 0; $a < 10; $a++) {
+    $row = $a * 5 + 4;
+    $tweet = $tweets[$row];
+    $date = $tweets[$row - 1];
+    $url = $tweets[$row - 2];
+
+    $tweetblock .= '<li><a class="tweet" href="' . $url . '">' . $tweet . '</a><p class="tweetdate">' . $date . '</p>';
+  }
+  $tweetblock .= '</ul><!-- tweetblock --></div><!-- tweetblock -->';
+
+  return $tweetblock;
+} // endfunction generate_twitter_block
