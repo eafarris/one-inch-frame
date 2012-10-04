@@ -87,7 +87,7 @@ function get_metadata($file) {
 // process metadata. This will expand the metadata array based on itself.
 function process_metadata(&$metadata) {
   global $webrooturl;
-  if ($metadata['type']) { // if there's a type, how to handle?
+  if (!empty($metadata['type'])) { // if there's a type, how to handle?
     switch ($metadata['type']) {
     case 'link': // wrap the title in an anchor tag, manipulate webshot
       $metadata['title'] = '<a href="' . $metadata['url'] . '">' . $metadata['title_text'] . '</a>';
