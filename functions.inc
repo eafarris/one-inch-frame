@@ -96,7 +96,7 @@ function process_metadata(&$metadata) {
     case 'link': // wrap the title in an anchor tag, manipulate webshot
       $metadata['title'] = '<a href="' . $metadata['url'] . '">' . $metadata['title_text'] . '</a>';
       $metadata['image_url'] = make_webshot($metadata['url'], $metadata['posted']);
-      $metadata['post_content'] = '<div class="webshot"><img src="' . $metadata['image_url'] . '"></div><!-- webshot -->';
+      $metadata['post_content'] = '<div class="webshot"><a href="' . $metadata['url'] . '"><img src="' . $metadata['image_url'] . '"></a></div><!-- webshot -->';
       break;
     case 'quote': // pre and post with a div
       $metadata['pre_content'] = '<div class="quote">';
@@ -104,7 +104,12 @@ function process_metadata(&$metadata) {
       break;
     case 'image': // add image to pre-content
       $metadata['image_url'] = cache_image($metadata['url'], $metadata['posted']);
-      $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['image_url'] . '"></div><!-- image -->';
+      if (isset($metadata['source'])) { // we've got a source, link it
+        $metadata['pre_content'] = '<div class="image"><a href="' . $metadata['source'] . '"><img src="' . $metadata['image_url'] . '"></a></div><!-- image -->';
+      }
+      else {
+        $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['image_url'] . '"></div><!-- image -->';
+      } // endifelse source
       break;
     default:
       break;
@@ -117,7 +122,7 @@ function process_metadata(&$metadata) {
   if (!empty($metadata['source'])) { // Add source and original list to post-content
     $metadata['post_content'] .= '<ul class="sources">';
     $metadata['post_content'] .= '<li><a class="source" href="' . $metadata['source'] . '">(source)</a>';
-    $metadata['post_content'] .= '<li><a class="original" href="' . $metadata['url'] . '">(view original)</a>';
+    $metadata['post_content'] .= isset($metadata['url'] ? '<li><a class="original" href="' . $metadata['url'] . '">(view original)</a>' : '';
     $metadata['post_content'] .= '</ul><!-- sources -->';
   }
 
@@ -217,7 +222,7 @@ function make_webshot($url, $posted) {
   }
   else {
     $commandline = $webkit2png . '--dir=' . $outputdir . '/images/webshots --filename=' . $posted . ' ' . $url;
-    //$output = shell_exec($commandline);
+    $output = shell_exec($commandline);
   }
   return $webrooturl . '/images/webshots/' . $posted . '-clipped.png';
 } // endfunction make_webshot

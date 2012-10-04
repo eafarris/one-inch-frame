@@ -52,15 +52,14 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
 
-if ($sources[0]['type'] == 'image') {
-  $indexcontent .= '<img src="' . $sources[0]['url'] . '" />';
-}
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
-$bottomcontent = "<h2>Recent content</h2>\n<ul>\n";
+$bottomcontent = "<h2>Recent content</h2><ul>";
 for ($a = 1; $a < 15; $a++) {
-  $bottomcontent .= '<li>' . l($sources[$a]) . "\n";
+  $bottomcontent .= '<li>' . l($sources[$a]);
 }
-$bottomcontent .= "</ul>\n";
+$bottomcontent .= "</ul>";
+$bottomcontent .= '<h2>Latest tweets</h2>';
+$bottomcontent .= generate_twitter_block();
 
 $replacements['meat']   = $indexcontent;
 $replacements['bottom'] = $bottomcontent;
