@@ -48,7 +48,7 @@ function get_metadata($file) {
   } //endforeach looping through metadata
 
   // right now, they're the same, but process_metadata() could change that.
-  $metadata['title_text'] = $metadata['title'];
+  $metadata['title_text'] = strtr($metadata['title'], array('$' => '&#36;'));
 
   // now add stuff we can get from the file itself
   $metadata['infile'] = $file;
@@ -179,7 +179,7 @@ function generate_content($metadata, $fullpage = TRUE) {
   $replacements['title_text'] = $metadata['title_text'];
   $replacements['title']      = $metadata['title'];
   $replacements['tags']       = $metadata['tags_ul'];
-  $replacements['meat']       = $content;
+  $replacements['meat']       = strtr($content, array('$' => '&#36;'));
   $replacements['date']       = date('j F Y', $metadata['posted']);
   $template = 'pages.html';
   $output = expand_template($replacements, $template);
@@ -222,8 +222,9 @@ function build_rss_feed($posts) { // RSS feed of the last 10 items
   global $webrooturl;
   global $outputdir;
 
-  $xml  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
-  $xml .= '<rss version="2.0">' . "\n<channel>\n";
+  $xml  = '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n";
+  $xml .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n<channel>\n";
+  $xml .= '<atom:link href="http://static.eafarris.com/rss.xml" rel="self" type="application/rss+xml" />';
   $xml .= "<title>eafarris.com</title>\n<link>http://www.eafarris.com</link>\n";
   $xml .= "<description>RSS feed of the last 10 items from eafarris.com</description>\n";
   $xml .= "<lastBuildDate>" . date('r') . "</lastBuildDate>\n<language>en-us</language>\n";
@@ -238,6 +239,7 @@ function build_rss_feed($posts) { // RSS feed of the last 10 items
     }
     $xml .= '<guid>' . $webrooturl . '/' . $posts[$a]['outfile_uri'] . "</guid>\n";
     $xml .= '<pubDate>' . date('r', $posts[$a]['posted']) . "</pubDate>\n";
+    $xml .= '<description>' . htmlspecialchars(generate_content($posts[$a], FALSE)) . '</description>';
     $xml .= "</item>\n\n";
   } // endfor looping through items for RSS feed
   $xml .= "</channel>\n</rss>\n";
