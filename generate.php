@@ -47,8 +47,10 @@ $replacements['sidebar'] = generate_recent_content_block($sources);
  */
 
 $indexcontent  = '<h1>' . $sources[0]['title'] . "</h1>\n";
-
+$indexcontent .= $sources[0]['pre_content'];
 $indexcontent .= process_article(file_get_contents($sources[0]['infile']));
+$indexcontent .= $sources[0]['post_content'];
+
 $bottomcontent = "<h2>Recent content</h2><ul>";
 for ($a = 1; $a < 15; $a++) {
   $bottomcontent .= '<li>' . l($sources[$a]);
