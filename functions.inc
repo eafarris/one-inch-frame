@@ -285,3 +285,20 @@ function generate_twitter_block() {
 
   return $tweetblock;
 } // endfunction generate_twitter_block
+
+// Creates a map between the 'icon' metadata and the character for
+// ModernPictsNormal
+function map_icons() {
+  $icons = array(
+    'camera' => 'A',
+    'books' => 'B',
+    'music' => 'C',
+    'facebook' => 'G',
+    'movies' => 'H',
+    'dislike' => 'L',
+    'ipod' => 'M',
+    'iphone' => 'O',
+  );
+  return $icons;
+}
+

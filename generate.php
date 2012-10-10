@@ -121,7 +121,7 @@ foreach ($tags as $tag) {
     $replacements['meat'] = '<ul>' . $tagged[$tag] . '</ul>';
     $replacements['tags'] = '';
   } // endif not supertag
-  $output = expand_template($replacements, 'pages.html');
+  $output = expand_template($replacements, 'tags.html');
   $ofn = $outputdir . '/tags/' . $tagfn;
   $ofh = fopen($ofn, 'w');
   fwrite($ofh, $output);

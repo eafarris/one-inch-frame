@@ -8,7 +8,7 @@
 date_default_timezone_set('America/New_York');
 
 // WEBROOTURL: Full URL to the root of this website. No trailing slash.
-$webrooturl = 'http://static.eafarris.com';
+$webrooturl = 'http://eafarris.com';
 
 // DATAFILES: path where raw posts are stored
 $datafiles = '/Users/eafarris/Dropbox/oif';
