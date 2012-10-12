@@ -89,6 +89,10 @@ function process_metadata(&$metadata) {
         $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['image_url'] . '"></div><!-- image -->';
       } // endifelse source
       break;
+    case 'video': // get thumbnail, add embed
+      $metadata['image_url'] = get_video_thumbnail($metadata['url'], $metadata['posted']);
+      $metadata['pre_content'] = '<div class="image"><img src="' . $metadata['image_url'] . '"></div><!-- image -->';
+      $metadata['post_content'] = '<div class="embed">' . make_video_embed($metadata['url']) . '</div><!-- embed -->';
     default:
       break;
     } // endswitch type
@@ -301,4 +305,34 @@ function map_icons() {
   );
   return $icons;
 }
+
+// Returns a local url for a thumbnail of a video. Only handles YouTube
+// right now, but could be enhanced for other services.
+//
+function get_video_thumbnail($url, $posted) {
+  global $outputdir;
+  global $webrooturl;
+
+  $localimage = $outputdir . '/images/thumbnails/' . $posted . '.jpg';
+  if (file_exists($localimage)) {
+    print "File for this URL already exists. Not created.\n";
+  }
+  else {
+    if (preg_match('/youtube.com/', $url)) { // URL is from YouTube
+      preg_match('/v=([^&]+)/', $url, &$matches);
+      copy ('http://img.youtube.com/vi/' . $matches[1] . '/0.jpg', $localimage);
+    } // endif youtube url
+    return $webrooturl . '/images/thumbnails/' . $posted . '.jpg';
+  } // endifelse need local image
+} // endfunction get_youtube_thumbnail
+
+// Returns an embed HTML snippet for a video. Only handled YouTube right
+// now, but could be enhanced for other services.
+//
+function make_video_embed($url) {
+  if (preg_match('/youtube.com/', $url)) { // youtube embed
+    preg_match('/v=([^&]+)/', $url, &$matches);
+    return '<iframe width="640" height="360" src="http://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
+  } // endif from youtube
+} // endfunction make_video_embed
 

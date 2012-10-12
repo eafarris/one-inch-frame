@@ -22,6 +22,5 @@ foreach (glob($datafiles. '/*.md')  as $infile) {
 
 $posts = blog_order($sources);
 
-print_r($posts);
+print_r($posts[0]);
 
-print generate_twitter_block();
