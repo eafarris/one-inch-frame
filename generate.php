@@ -5,6 +5,8 @@
  * Generate the HTML for the site
  */
 
+$options = getopt('t',array('tweetsonly');
+
 // INTERNAL HELPER FUNCTIONS
 require_once('functions.inc');
 

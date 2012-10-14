@@ -5,6 +5,9 @@
  * just a script to test functions, etc.
  */
 
+$options = getopt('t:', array('tweetsonly:',));
+var_dump($options);
+
 // INTERNAL HELPER FUNCTIONS
 require_once('functions.inc');
 
@@ -13,7 +16,6 @@ require_once('config.php');
 
 /*
  * GRAB METADATA
- */
 foreach (glob($datafiles. '/*.md')  as $infile) {
   if (is_file($infile)) {
     $sources[] = get_metadata($infile);
@@ -23,4 +25,4 @@ foreach (glob($datafiles. '/*.md')  as $infile) {
 $posts = blog_order($sources);
 
 print_r($posts[0]);
-
+ */
