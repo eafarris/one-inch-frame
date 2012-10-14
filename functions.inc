@@ -148,6 +148,7 @@ function generate_recent_content_block($sources) {
 // Takes content and a template file and returns a generated page
 function expand_template($replacements, $templatefile) {
   global $templates;
+  $patterns['head']       = '/<!-- head stuff goes here -->/';
   $patterns['header']     = '/<!-- header goes here -->/';
   $patterns['footer']     = '/<!-- footer goes here -->/';
   $patterns['sidebar']    = '/<!-- sidebar content goes here -->/';
