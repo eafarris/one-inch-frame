@@ -323,8 +323,8 @@ function get_video_thumbnail($url, $posted) {
       preg_match('/v=([^&]+)/', $url, &$matches);
       copy ('http://img.youtube.com/vi/' . $matches[1] . '/0.jpg', $localimage);
     } // endif youtube url
-    return $webrooturl . '/images/thumbnails/' . $posted . '.jpg';
   } // endifelse need local image
+  return $webrooturl . '/images/thumbnails/' . $posted . '.jpg';
 } // endfunction get_youtube_thumbnail
 
 // Returns an embed HTML snippet for a video. Only handled YouTube right
