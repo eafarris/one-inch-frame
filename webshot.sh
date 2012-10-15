@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# This script produces a screenshot of a webpage. It uses
+# [webkit2png](http://www.paulhammond.org/webkit2png/) and ImageMagick
+# to perform the conversion.
+
+TEMP=/tmp
+
+/Users/eafarris/webkit2png/webkit2png --fullsize --width=1024 --dir=$TEMP --filename $2 $1
+/usr/local/bin/convert $TEMP/$2-full.png -crop 1024x600+0+0 -resize 640x480 $3/$2.png
+

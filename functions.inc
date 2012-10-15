@@ -191,21 +191,24 @@ function generate_content($metadata, $fullpage = TRUE) {
   return $output;
 } // endfunction generate_content
 
-// if it doesn't already exist, make a screenshot from a URL with webkit2png, name it after the 'posted' metadata
-// return the URI of the file
+// if it doesn't already exist, make a screenshot from a URL via
+// external script. Return the URI of the file
 function make_webshot($url, $posted) {
   global $outputdir;
-  global $webkit2png;
   global $webrooturl;
+  global $webshotscript;
 
-  if (file_exists($outputdir . '/images/webshots/' . $posted . '-clipped.png')) {
+  $localdir = $outputdir . '/images/webshots';
+  $localimage = $localdir . '/' . $posted . '.png';
+
+  if (file_exists($localimage)) {
     print "File for this URL already exists. Not created.\n";
   }
   else {
-    $commandline = $webkit2png . '--dir=' . $outputdir . '/images/webshots --filename=' . $posted . ' ' . $url;
+    $commandline = $webshotscript . ' ' . $url . ' ' . $posted . ' ' . $localdir;
     $output = shell_exec($commandline);
   }
-  return $webrooturl . '/images/webshots/' . $posted . '-clipped.png';
+  return $webrooturl . '/images/webshots/' . $posted . '.png';
 } // endfunction make_webshot
 
 function cache_image($url, $posted) {
