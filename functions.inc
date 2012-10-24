@@ -201,13 +201,10 @@ function make_webshot($url, $posted) {
   $localdir = $outputdir . '/images/webshots';
   $localimage = $localdir . '/' . $posted . '.png';
 
-  if (file_exists($localimage)) {
-    print "File for this URL already exists. Not created.\n";
-  }
-  else {
+  if (!file_exists($localimage)) {
     $commandline = $webshotscript . ' ' . $url . ' ' . $posted . ' ' . $localdir;
     $output = shell_exec($commandline);
-  }
+  } // endif haven't grabbed this one
   return $webrooturl . '/images/webshots/' . $posted . '.png';
 } // endfunction make_webshot
 
@@ -217,12 +214,9 @@ function cache_image($url, $posted) {
 
   $localimage = $outputdir . '/images/' . $posted . '.jpg';
 
-  if (file_exists($localimage)) {
-    print "File for this URL already exists. Not created.\n";
-  }
-  else {
+  if (!file_exists($localimage)) {
     copy($url, $localimage);
-  }
+  } // endif haven't grabbed this one
     return $webrooturl . '/images/' . $posted . '.jpg';
 } // endfunction cache_image
 
@@ -318,15 +312,12 @@ function get_video_thumbnail($url, $posted) {
   global $webrooturl;
 
   $localimage = $outputdir . '/images/thumbnails/' . $posted . '.jpg';
-  if (file_exists($localimage)) {
-    print "File for this URL already exists. Not created.\n";
-  }
-  else {
+  if (!file_exists($localimage)) {
     if (preg_match('/youtube.com/', $url)) { // URL is from YouTube
       preg_match('/v=([^&]+)/', $url, &$matches);
       copy ('http://img.youtube.com/vi/' . $matches[1] . '/0.jpg', $localimage);
     } // endif youtube url
-  } // endifelse need local image
+  } // endif haven't grabbed this one
   return $webrooturl . '/images/thumbnails/' . $posted . '.jpg';
 } // endfunction get_youtube_thumbnail
 
