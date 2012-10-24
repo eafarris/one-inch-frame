@@ -234,7 +234,7 @@ function build_rss_feed($posts) { // RSS feed of the last 10 items
     $xml .= "<item>\n";
     $xml .= '<title>' . $posts[$a]['title_text'] . "</title>\n";
     if ($posts[$a]['type'] == 'link') {
-      $xml .= '<link>' . $posts[$a]['url'] . "</link>\n";
+      $xml .= '<link>' . htmlspecialchars($posts[$a]['url']) . "</link>\n";
     }
     else {
       $xml .= '<link>' . $webrooturl . '/' . $posts[$a]['outfile_uri'] . "</link>\n";
